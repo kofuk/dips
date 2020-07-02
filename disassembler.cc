@@ -339,6 +339,7 @@ namespace dips {
             if (itr != labels.end()) {
                 std::cout << (*itr).second << ':' << std::endl;
             }
+            std::cout << "  0x" << std::setw(8) << std::setfill('0') << pc;
             emit_asm(i);
             pc += 4;
         }
