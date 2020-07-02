@@ -16,7 +16,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include <bits/types/FILE.h>
 #include <cstdint>
+#include <cstdio>
+#include <cstdlib>
 #include <fstream>
 #include <iomanip>
 #include <ios>
@@ -320,18 +323,33 @@ namespace dips {
     }
 
     void disassembler::disassemble() noexcept(false) {
-        std::ifstream strm = std::ifstream(infile);
-        if (!strm) {
-            throw std::runtime_error("failed to open input file");
+        std::FILE *in;
+        if (ascii_input) {
+            std::string cmdline = "xxd -ps -r -- '" + infile + "'";
+            in = popen(cmdline.c_str(), "r");
+            if (!in) {
+                throw std::runtime_error("failed to exec xxd");
+            }
+        } else {
+            in = std::fopen(infile.c_str(), "r");
+            if (!in) {
+                throw std::runtime_error("failed to open input file");
+            }
         }
 
         pc = base;
         std::cout << std::hex;
         char buf[4096];
         do {
-            strm.read(buf, 4096);
-            decode_instructions(buf, static_cast<size_t>(strm.gcount()));
-        } while (!strm.eof());
+            size_t n = std::fread(buf, 1, 4096, in);
+            decode_instructions(buf, n);
+        } while (!feof(in));
+
+        if (ascii_input) {
+            pclose(in);
+        } else {
+            std::fclose(in);
+        }
 
         pc = base;
         for (const instruction &i : instructions) {
@@ -343,5 +361,9 @@ namespace dips {
             emit_asm(i);
             pc += 4;
         }
+    }
+
+    void disassembler::read_ascii() {
+        ascii_input = true;
     }
 } // namespace dips

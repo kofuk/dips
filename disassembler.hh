@@ -49,6 +49,7 @@ namespace dips {
     class disassembler {
         std::string infile;
         std::uint32_t base;
+        bool ascii_input = false;
 
         std::uint32_t pc;
         std::unordered_map<std::uint32_t, std::string> labels;
@@ -74,6 +75,7 @@ namespace dips {
         disassembler(const std::string infile, const std::uint32_t base);
 
         void disassemble() noexcept(false);
+        void read_ascii();
     };
 } // namespace dips
 

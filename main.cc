@@ -18,6 +18,7 @@
 
 #include <cstdint>
 #include <cstring>
+#include <ctime>
 #include <fstream>
 #include <iostream>
 #include <stdexcept>
@@ -30,6 +31,9 @@ namespace {
         std::cout << "usage: dips [OPTIONS]... FILE" << std::endl;
         std::cout << "  --base N    Base address (e.g. 0x10000000)"
                   << std::endl;
+        std::cout << "  --hex       Read instructions from hex ascii file"
+
+                  << std::endl;
     }
 
     void print_version() {
@@ -40,6 +44,7 @@ namespace {
 
 int main(int argc, char **argv) {
     std::uint32_t base = 0;
+    bool ascii = false;
     std::string infile;
     for (int i = 1; i < argc; ++i) {
         if (!strncmp(argv[i], "--", 2)) {
@@ -56,6 +61,8 @@ int main(int argc, char **argv) {
                     print_usage();
                     return 1;
                 }
+            } else if (!strcmp(argv[i], "--ascii")) {
+                ascii = true;
             } else if (!strcmp(argv[i], "--version")) {
                 print_version();
                 return 0;
@@ -77,6 +84,9 @@ int main(int argc, char **argv) {
     }
 
     dips::disassembler d(infile, base);
+    if (ascii) {
+        d.read_ascii();
+    }
     try {
         d.disassemble();
     } catch (const std::runtime_error &e) {
