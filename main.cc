@@ -31,7 +31,7 @@ namespace {
         std::cout << "usage: dips [OPTIONS]... FILE" << std::endl;
         std::cout << "  --base N    Base address (e.g. 0x10000000)"
                   << std::endl;
-        std::cout << "  --hex       Read instructions from hex ascii file"
+        std::cout << "  --ascii     Read instructions from hex ascii file"
 
                   << std::endl;
     }
